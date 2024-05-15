@@ -1,0 +1,14 @@
+annotations:
+  imageDigest: sha256:cf77bf205e65ad5cc8bef0a72f41bd2f2da349202a2829f37097c67fc7a063d7
+  imageName: randoli/demographics-service:uat
+  kustomizeRepoPath: apps/app-insights-uat/demographics-service
+  kustomizeRepoUrl: git@gitlab.com:randoli/ps/cust/slfnha/demographics-service.git
+  kustomizeRevision: 6ee1d268b551d0945ccab0cc059af42df39879f5
+  sourceRepoUrl: git@gitlab.com:randoli/ps/cust/slfnha/demographics-service.git
+  sourceRevision: main
+apiVersion: v2
+appVersion: 1.13.0
+description: Helm chart for demographics-service
+name: demographics-service-uat
+type: application
+version: 0.1.9

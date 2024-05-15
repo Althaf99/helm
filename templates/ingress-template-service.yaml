@@ -1,0 +1,24 @@
+{{- if.Values.server.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/plugins: uat-jwt-claims-to-headers,uat-jwt-keycloak,uat-cors-plugin,uat-app-director-request-transformer
+  labels:
+    app: { { .Values.global.name } }
+    group: { { .Values.global.group } }
+  name: { { .Values.global.name } }
+  namespace: { { .Values.global.namespace } }
+spec:
+  ingressClassName: kong-uat
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: { { .Values.global.name } }
+                port:
+                  number: 8080
+            path: /appdir/(?<servicename>demographics)/(?<rest>\S*)
+            pathType: ImplementationSpecific
+{{- end -}}

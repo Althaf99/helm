@@ -1,0 +1,95 @@
+global:
+  name: appdir-b0e0efb5-app-insights-ui-deployment-dev
+  namespace: app-insights-dev
+
+metadata:
+  uid: 83cccebe-6b7a-4166-8826-93366efd100a
+  resourceVersion: '1792697060'
+  generation: 104
+  creationTimestamp: '2024-03-12T05:49:43Z'
+
+conditions:
+  - type: Available
+    status: 'True'
+    lastUpdateTime: '2024-04-10T02:55:14Z'
+    lastTransitionTime: '2024-04-10T02:55:14Z'
+    reason: MinimumReplicasAvailable
+    message: Deployment has minimum availability.
+  - type: Progressing
+    status: 'True'
+    lastUpdateTime: '2024-05-15T06:40:28Z'
+    lastTransitionTime: '2024-03-12T05:49:43Z'
+    reason: NewReplicaSetAvailable
+    message: >
+      ReplicaSet "appdir-b0e0efb5-app-insights-ui-deployment-dev-669fcbcd94"
+      has successfully progressed.
+
+status:
+  observedGeneration: 104
+  replicas: 1
+  updatedReplicas: 1
+  readyReplicas: 1
+  availableReplicas: 1
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-insights-ui
+      app-id: 90842f57-f0db-45f5-92d6-86beb3cd9de9
+      randoli.io/cost.group: app-insights---dev
+      randoli.io/watch.id: eaa09dc6-5d0e-40c6-8f39-53f645c61461
+
+containers:
+  - name: appdir-b0e0efb5-app-insights-ui
+    image: docker.io/randoli/insights-app:dev
+    ports:
+      - containerPort: 8080
+        protocol: TCP
+    envFrom:
+      - configMapRef:
+          name: appdir-b0e0efb5-app-insights-ui-configmap-dev
+    resources:
+      limits:
+        cpu: 100m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+    volumeMounts:
+      - name: app-insights-ui-keycloak-config-cm-volume
+        mountPath: /workspace/build/keycloak.json
+        subPath: keycloak.json
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+        scheme: HTTP
+      initialDelaySeconds: 5
+      timeoutSeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 10
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    imagePullPolicy: Always
+    securityContext:
+      privileged: false
+
+volumes:
+  - name: app-insights-ui-keycloak-config-cm-volume
+    configMap:
+      name: app-insights-ui-keycloak-config
+      defaultMode: 420
+
+serviceAccountName: app-insights-ui-sa-dev
+serviceAccount: app-insights-ui-sa-dev
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 25%
+    maxSurge: 25%
+
+revisionHistoryLimit: 1
+progressDeadlineSeconds: 600

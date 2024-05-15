@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: {{ .Values.global.name }}
+    group: {{ .Values.global.group }}
+    org: {{ .Values.global.org }}
+  name: {{ .Values.global.name }}
+  namespace: {{ .Values.global.namespace }}
+{{- if eq .Values.language "java-spring-boot" }}
+data:
+  spring:
+    mvc:
+      pathmatch:
+        matching-strategy: ANT_PATH_MATCHER
+    profiles:
+      active: { { .Values.global.env } }
+    datasource:
+      url: { { .Values.datasource.url } }
+      username: { { .Values.datasource.username } }
+      password: { { .Values.datasource.password } }
+      driverClassName: { { .Values.datasource.driverClassName } }
+    jpa:
+      show-sql: true
+      database-platform: org.hibernate.dialect.SybaseDialect
+      open-in-view: false
+      hibernate:
+        ddl-auto: validate
+      properties:
+        hibernate:
+          format_sql: true
+  server:
+    address: 0.0.0.0
+    port: 8060
+    servlet:
+      contextPath: /demographics
+    tomcat:
+      max-threads: 5
+  management:
+    server:
+      address: 0.0.0.0
+      port: 8050
+    endpoints:
+      enabled-by-default: false
+      web:
+        exposure:
+          include: info, health, prometheus
+    endpoint:
+      info:
+        enabled: true
+      health:
+        enabled: false
+      prometheus:
+        enabled: false
+  logging:
+    level:
+      root: INFO
+      org.springframework.jdbc: INFO
+      org.hibernate.SQL: INFO
+      org.hibernate.type.descriptor.sql.BasicBinder: INFO
+      com.zaxxer.hikari.HikariConfig: INFO
+      org.springframework.transaction.interceptor: INFO
+      org.apache.camel: INFO
+  camel:
+    springboot:
+      name: DemographicsServiceCtx
+    servlet:
+      mapping:
+        context-path: /api/v1/*
+  randoli:
+    service:
+      apiDocs:
+        basePackage: "ca.slfnha.service.demographics"
+      paging:
+        size: 10
+{{- end }}
+{{- if eq .Values.language "go" }}
+data:
+  AUTO_MIGRATE_DB: "true"
+  CONTEXT_PATH: demographics
+  HTTP_LISTEN_ADDRESS: :8080
+  LOG_CALLER: "true"
+  LOG_FORMAT: CONSOLE
+  LOG_LEVEL: info
+  METRICS_SERVER_LISTEN_ADDRESS: :8085
+  POSTGRES_CONN_MAX_IDLE: "2"
+  POSTGRES_CONN_MAX_LIFETIME: 30s
+  POSTGRES_CONN_POOL_SIZE: "5"
+{{- end }}
