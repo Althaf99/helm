@@ -4,18 +4,18 @@ metadata:
   name: {{ .Values.global.name }}
   namespace: {{ .Values.global.namespace }}
   labels:
-    {{- include "metadata.labels" | nindent 4 }}
+    {{- tpl ("metadata.labels" | toYaml) . | nindent 4 }}
   annotations:
-    {{- include "metadata.annotations" | nindent 4 }}
+    {{- tpl ("metadata.annotations" | toYaml) . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "spec.matchLabels" | nindent 6 }}
+      {{- tpl ("spec.matchLabels" | toYaml) . | nindent 3 }}
   template:
     metadata:
       labels:
-        {{- include "metadata.labels" | nindent 8 }}
+        {{- tpl ("metadata.labels.test" | toYaml) . | nindent 4 }}
     spec:
       containers:
       - name: {{ .Values.containers.name }}
@@ -24,7 +24,7 @@ spec:
         {{- toYaml . | nindent 12 }}  
       {{- end }}
         ports:
-          {{- include "container.ports" | nindent 8 }}
+          {{- tpl ("container.ports" | toYaml) . | nindent 5 }}
         envFrom:
         {{- if .Values.env.secrets }}
             {{- range .Values.env.secrets }}
@@ -33,38 +33,38 @@ spec:
             {{- end }}
         {{- end }}
           resources:
-            {{- if eq .Values.language "go" }}
+          {{- if eq .Values.language "go" }}
             limits:
               cpu: 50m
               memory: 60Mi
             requests:
               cpu: 50m
               memory: 60Mi
-            {{- end }}
-            {{- if eq .Values.language "java-spring-boot" }}
+          {{- end }}
+          {{- if eq .Values.language "javaSpringBoot" }}
             limits:
               cpu: 50m
               memory: 256Mi
             requests:
               cpu: 50m
               memory: 256Mi
-            {{- end }}
-            {{- if eq .Values.language "java-quarkus" }}
+          {{- end }}
+          {{- if eq .Values.language "java-quarkus" }}
             limits:
               cpu: 50m
               memory: 120Mi
             requests:
               cpu: 25m
               memory: 100Mi
-            {{- end }}
+          {{- end }}
           imagePullPolicy: Always
         {{- if .Values.spec.containers.volumeMounts }}
           volumeMounts:
-            {{- include "spec.containers.volumeMounts" | nindent 8 }}
+            {{- tpl ("spec.containers.volumeMounts" | toYaml) . | nindent 6 }}
         {{- end}}
         {{- if .Values.spec.containers.volumeMounts }}
           livenessProbe:
-            {{- include "spec.containers.livenessProbe" | nindent 8 }}
+            {{- tpl ("spec.containers.livenessProbe" | toYaml) . | nindent 6 }}
         {{- end}}
       serviceAccountName: {{ .Values.serviceAccountName }}
       serviceAccount: {{ .Values.serviceAccount }}

@@ -1,14 +1,30 @@
 
 {{- define "metadata.labels" -}}
-    {{- include "common.lables" | nindent 4 }}
+    app: {{ .Values.global.name }}
+    app-id: {{ .Values.metadata.appId }}
+    randoli.io/cost.group: {{ .Values.metadata.costGroup }}
+    randoli.io/watch.id: {{ .Values.metadata.watchId }}
+{{- end }}
+
+{{- define "metadata.labels.test" -}}
+    app: {{ .Values.global.name }}
+    app-id: {{ .Values.metadata.appId }}
+    randoli.io/cost.group: {{ .Values.metadata.costGroup }}
+    randoli.io/watch.id: {{ .Values.metadata.watchId }}
 {{- end }}
 
 {{- define "metadata.annotations" -}}
-    {{- include "common.lables" | nindent 4 }}
+    app: {{ .Values.global.name }}
+    app-id: {{ .Values.metadata.appId }}
+    randoli.io/cost.group: {{ .Values.metadata.costGroup }}
+    randoli.io/watch.id: {{ .Values.metadata.watchId }}
 {{- end }}
 
 {{- define "spec.matchLabels" -}}
-    {{- include "common.lables" | nindent 4 }}
+    app: {{ .Values.global.name }}
+    app-id: {{ .Values.metadata.appId }}
+    randoli.io/cost.group: {{ .Values.metadata.costGroup }}
+    randoli.io/watch.id: {{ .Values.metadata.watchId }}
 {{- end }}
 
 {{- define "common.lables" -}}

@@ -1,32 +1,23 @@
 global:
-  name: my-deployment
-  namespace: default
+  name: appdir-b0e0efb5-app-insights-ui-deployment-dev
+  namespace: app-insights-dev
+  host: randoli.ca
 
-containers:
-  name: my-container
 
-configmapReload:
-  prometheus:
-    resources:
-      image: "my-prometheus-image:latest"
+volumes:
+  - name: app-insights-ui-keycloak-config-cm-volume
+    configMap:
+      name: app-insights-ui-keycloak-config
+      defaultMode: 420
 
-env:
-  secrets:
-    - refName: my-secret-ref
-      fileName: my-secret-file
+serviceAccountName: app-insights-ui-sa-dev
+serviceAccount: app-insights-ui-sa-dev
 
-language: go
 
-spec:
-  containers:
-    volumeMounts:
-      - name: my-volume
-        mountPath: /path/to/mount
-    livenessProbe:
-      httpGet:
-        path: /healthz
-        port: 8080
+# File: values.yaml
 
-serviceAccountName: my-service-account
-serviceAccount: my-service-account
-imagePullSecrets: my-image-pull-secret
+labels:
+  app: my-app
+  environment: production
+  tier: backend
+
