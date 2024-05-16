@@ -3,71 +3,35 @@ kind: Deployment
 metadata:
   name: {{ .Values.global.name }}
   namespace: {{ .Values.global.namespace }}
-  uid: {{ .Values.metadata.uid }}
-  resourceVersion: {{ .Values.metadata.resourceVersion }}
-  generation: {{ .Values.metadata.generation }}
-  creationTimestamp: {{ .Values.metadata.creationTimestamp }}
   labels:
-    {{- include "metadata.labels" | nindent 4 }}
+    {{- include "metadata.labels" . | nindent 4 }}
   annotations:
-    {{- include "metadata.annotations" | nindent 4 }}
-  managedFields:
-    {{- range .Values.metadata.managedFields }}
-    - manager: {{ .manager }}
-      operation: {{ .operation }}
-      apiVersion: {{ .apiVersion }}
-      time: {{ .time }}
-      fieldsType: {{ .fieldsType }}
-      fieldsV1:
-        {{- include "metadata.managedFields.fieldsV1" | nindent 8 }}
-    {{- end }}
-  selfLink: >-
-  {{ .Values.metadata.selfLink }}  
-status:
-  observedGeneration: {{ .Values.status.observedGeneration }} 
-  replicas: 1
-  updatedReplicas: 1
-  readyReplicas: 1
-  availableReplicas: 1
-  conditions:
-  {{- range .Values.conditions }}
-    - type: {{ .type }}
-      status: '{{ .status }}'
-      lastUpdateTime: '{{ .lastUpdateTime }}'
-      lastTransitionTime: '{{ .lastTransitionTime }}'
-      reason: {{ .reason }}
-      message: >-
-  {{ .message | indent 6 }}
-  {{- end }}
+    {{- include "metadata.annotations" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "spec.matchLabels" | nindent 6 }}
+      {{- include "spec.matchLabels" . | nindent 6 }}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        {{- include "metadata.labels" | nindent 8 }}
-      annotations:
-        {{- include "template.annotations" | nindent 8 }}
+        {{- include "metadata.labels" . | nindent 8 }}
     spec:
-      volumes:
-        {{- include "spec.volumes" | nindent 8 }}
       containers:
-        - name: {{ .Values.containers.name }}
-          image: >-
-          {{ .Values.containers.image | indent 6 }}   
-          ports:
-            - containerPort: 8080
-              protocol: TCP
-          envFrom:
-            {{- if .Values.env.secrets }}
+      - name: {{ .Values.containers.name }}
+      {{- with .Values.configmapReload.prometheus.resources }}
+        image: >-
+        {{- toYaml . | nindent 12 }}  
+      {{- end }}
+        ports:
+          {{- include "container.ports" . | nindent 8 }}
+        envFrom:
+        {{- if .Values.env.secrets }}
             {{- range .Values.env.secrets }}
             - {{ .refName }}
               name: {{ .fileName }}
             {{- end }}
-            {{- end }}
+        {{- end }}
           resources:
             {{- if eq .Values.language "go" }}
             limits:
@@ -93,28 +57,16 @@ spec:
               cpu: 25m
               memory: 100Mi
             {{- end }}
-          terminationMessagePath: {{ .Values.spec.terminationMessagePath }}
-          terminationMessagePolicy: File
           imagePullPolicy: Always
-          securityContext:
-            privileged: false
+        {{- if .Values.spec.containers.volumeMounts }}
           volumeMounts:
-            {{- include "spec.containers.volumeMounts" | nindent 8 }}
+            {{- include "spec.containers.volumeMounts" . | nindent 8 }}
+        {{- end}}
+        {{- if .Values.spec.containers.volumeMounts }}
           livenessProbe:
-            {{- include "spec.containers.livenessProbe" | nindent 8 }}
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
-      dnsPolicy: ClusterFirst
-      serviceAccountName: integration-service-sa-dev
-      serviceAccount: integration-service-sa-dev
-      securityContext: {}
-      schedulerName: default-scheduler
+            {{- include "spec.containers.livenessProbe" . | nindent 8 }}
+        {{- end}}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      serviceAccount: {{ .Values.serviceAccount }}
       imagePullSecrets:
-        - name: dockerhub-push-pull-secret
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
-  revisionHistoryLimit: 1
-  progressDeadlineSeconds: 600
+        - name: {{ .Values.imagePullSecrets }}
