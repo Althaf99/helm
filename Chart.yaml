@@ -9,6 +9,6 @@ annotations:
 apiVersion: v2
 appVersion: 1.13.0
 description: Helm chart for demographics-service
-name: demographics-service-uat
+name: testing
 type: application
 version: 0.1.9

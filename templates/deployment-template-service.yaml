@@ -4,18 +4,18 @@ metadata:
   name: {{ .Values.global.name }}
   namespace: {{ .Values.global.namespace }}
   labels:
-    {{- include "metadata.labels" . | nindent 4 }}
+    {{- include "metadata.labels" | nindent 4 }}
   annotations:
-    {{- include "metadata.annotations" . | nindent 4 }}
+    {{- include "metadata.annotations" | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "spec.matchLabels" . | nindent 6 }}
+      {{- include "spec.matchLabels" | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "metadata.labels" . | nindent 8 }}
+        {{- include "metadata.labels" | nindent 8 }}
     spec:
       containers:
       - name: {{ .Values.containers.name }}
@@ -24,7 +24,7 @@ spec:
         {{- toYaml . | nindent 12 }}  
       {{- end }}
         ports:
-          {{- include "container.ports" . | nindent 8 }}
+          {{- include "container.ports" | nindent 8 }}
         envFrom:
         {{- if .Values.env.secrets }}
             {{- range .Values.env.secrets }}
@@ -60,11 +60,11 @@ spec:
           imagePullPolicy: Always
         {{- if .Values.spec.containers.volumeMounts }}
           volumeMounts:
-            {{- include "spec.containers.volumeMounts" . | nindent 8 }}
+            {{- include "spec.containers.volumeMounts" | nindent 8 }}
         {{- end}}
         {{- if .Values.spec.containers.volumeMounts }}
           livenessProbe:
-            {{- include "spec.containers.livenessProbe" . | nindent 8 }}
+            {{- include "spec.containers.livenessProbe" | nindent 8 }}
         {{- end}}
       serviceAccountName: {{ .Values.serviceAccountName }}
       serviceAccount: {{ .Values.serviceAccount }}
